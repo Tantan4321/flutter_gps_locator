@@ -42,16 +42,15 @@ class _HomePageState extends State<HomePage> {
     await _locationService.changeSettings(accuracy: LocationAccuracy.HIGH, interval: 1000);
 
     LocationData location;
-    
+
     try {
       bool serviceStatus = await _locationService.serviceEnabled();
       if (serviceStatus) {
-        bool perm =await _locationService.requestPermission();
+        bool perm = await _locationService.requestPermission();
         if (perm) {
           location = await _locationService.getLocation();
 
           _locationSubscription = _locationService.onLocationChanged().listen((LocationData result) async {
-
             if(mounted){
               setState(() {
                 _location = result;
@@ -91,7 +90,7 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Icon(Icons.location_on,
-            color: Colors.blue,
+            color: _location != null  ? Colors.blue : Colors.grey,
             size: width * 0.5,
             ),
             SizedBox(height: height * 0.1),
@@ -108,7 +107,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Expanded(
                   child: Text(
-                    _location.latitude != null ? _location.latitude.toStringAsPrecision(7) : "0",
+                    _location != null  ? _location.latitude.toStringAsPrecision(7) : "",
                     textAlign: TextAlign.left,
                     style: Theme.of(context).textTheme.display2,
                   ),
@@ -129,7 +128,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Expanded(
                   child: Text(
-                    _location.longitude != null ? _location.longitude.toStringAsPrecision(7) : "0",
+                    _location != null ? _location.longitude.toStringAsPrecision(7) : "",
                     textAlign: TextAlign.left,
                     style: Theme.of(context).textTheme.display2,
                   ),

@@ -33,6 +33,50 @@ class _HomePageState extends State<HomePage> {
   Location _locationService = new Location();
 
   @override
+  void initState() {
+    super.initState();
+    initPlatformState();
+  }
+
+  initPlatformState() async {
+    await _locationService.changeSettings(accuracy: LocationAccuracy.HIGH, interval: 1000);
+
+    LocationData location;
+    
+    try {
+      bool serviceStatus = await _locationService.serviceEnabled();
+      if (serviceStatus) {
+        bool perm =await _locationService.requestPermission();
+        if (perm) {
+          location = await _locationService.getLocation();
+
+          _locationSubscription = _locationService.onLocationChanged().listen((LocationData result) async {
+
+            if(mounted){
+              setState(() {
+                _location = result;
+              });
+            }
+          });
+        }
+      } else {
+        bool serviceStatusResult = await _locationService.requestService();
+        print("Service status activated after request: $serviceStatusResult");
+        if(serviceStatusResult){
+          initPlatformState();
+        }
+      }
+    } on Exception catch (e) {
+      print(e);
+      location = null;
+    }
+
+    setState(() {
+    });
+
+  }
+
+  @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
@@ -46,20 +90,25 @@ class _HomePageState extends State<HomePage> {
 
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Icon(Icons.location_on,
+            color: Colors.blue,
+            size: width * 0.5,
+            ),
+            SizedBox(height: height * 0.1),
             Row(
               children: <Widget>[
                 Container(
                   padding: const EdgeInsets.all(12.0),
                   width: width * 0.4,
                   child: Text(
-                    'Lattitude:',
+                    'Latitude:',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.title,
                   ),
                 ),
                 Expanded(
                   child: Text(
-                    '0',
+                    _location.latitude != null ? _location.latitude.toStringAsPrecision(7) : "0",
                     textAlign: TextAlign.left,
                     style: Theme.of(context).textTheme.display2,
                   ),
@@ -80,7 +129,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Expanded(
                   child: Text(
-                    '0',
+                    _location.longitude != null ? _location.longitude.toStringAsPrecision(7) : "0",
                     textAlign: TextAlign.left,
                     style: Theme.of(context).textTheme.display2,
                   ),

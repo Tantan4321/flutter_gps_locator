@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 
 void main() => runApp(MyApp());
 
@@ -10,37 +13,32 @@ class MyApp extends StatelessWidget {
       title: 'My Location',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
+class HomePage extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _HomePageState extends State<HomePage> {
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  LocationData _location;
+  StreamSubscription<LocationData> _locationSubscription;
+
+  Location _locationService = new Location();
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text('My Location'),
       ),
       body: Center(
 
@@ -48,20 +46,49 @@ class _MyHomePageState extends State<MyHomePage> {
 
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+            Row(
+              children: <Widget>[
+                Container(
+                  padding: const EdgeInsets.all(12.0),
+                  width: width * 0.4,
+                  child: Text(
+                    'Lattitude:',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    '0',
+                    textAlign: TextAlign.left,
+                    style: Theme.of(context).textTheme.display2,
+                  ),
+                ),
+              ],
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
+            SizedBox(height: height * 0.1),
+            Row(
+              children: <Widget>[
+                Container(
+                  padding: const EdgeInsets.all(12.0),
+                  width: width * 0.4,
+                  child: Text(
+                    'Longitude:',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    '0',
+                    textAlign: TextAlign.left,
+                    style: Theme.of(context).textTheme.display2,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
       ),
     );
   }
